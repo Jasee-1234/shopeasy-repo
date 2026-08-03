@@ -1,0 +1,19 @@
+version: 0.2
+
+phases:
+  build:
+    commands:
+      - echo Injecting live API URLs into the storefront...
+      - cd frontend
+      - sed -i "s|http://REPLACE-WITH-PRODUCT-ALB-DNS-NAME|${PRODUCT_API_URL}|g" app.js
+      - sed -i "s|http://REPLACE-WITH-ORDER-ALB-DNS-NAME|${ORDER_API_URL}|g" app.js
+      - rm -f images/README.md
+
+artifacts:
+  files:
+    - index.html
+    - styles.css
+    - app.js
+    - images/**/*
+  base-directory: frontend
+  discard-paths: no

@@ -1,0 +1,39 @@
+version: 0.2
+phases:
+  install:
+    commands:
+      - echo Installing test dependencies...
+      - pip install -q -r services/product-service/requirements.txt pytest --break-system-packages
+  pre_build:
+    commands:
+      - echo Running tests before we build anything...
+      - cd services/product-service && python -m pytest tests/ -v && cd ../..
+      - echo Logging in to Amazon ECR...
+      - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
+      - IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-8)
+      - echo "Image tag is $IMAGE_TAG"
+  build:
+    commands:
+      - echo Building the product-service Docker image...
+      - cd services/product-service
+      - docker build -t $ECR_REPO_URL:$IMAGE_TAG -t $ECR_REPO_URL:latest .
+      - cd ../..
+  post_build:
+    commands:
+      - echo Pushing image to ECR...
+      - docker push $ECR_REPO_URL:$IMAGE_TAG
+      - docker push $ECR_REPO_URL:latest
+      - echo Writing imageDetail.json for the CodeDeployToECS deploy action...
+      - printf '{"ImageURI":"%s"}' $ECR_REPO_URL:$IMAGE_TAG > imageDetail.json
+      - echo Updating taskdef.json with role ARNs and region...
+      - sed -i "s|<EXECUTION_ROLE_ARN>|$EXECUTION_ROLE_ARN|g; s|<TASK_ROLE_ARN>|$TASK_ROLE_ARN|g; s|<AWS_REGION>|$AWS_DEFAULT_REGION|g" services/product-service/taskdef.json
+      - echo Copying the 3 required files to the root for the artifact...
+      - cp imageDetail.json services/product-service/taskdef.json services/product-service/appspec.yml .
+      - echo "Build completed on $(date)"
+      - cat taskdef.json
+artifacts:
+  files:
+    - imageDetail.json
+    - taskdef.json
+    - appspec.yml
+  base-directory: .

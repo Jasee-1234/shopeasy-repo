@@ -1,0 +1,50 @@
+{
+  "family": "shopeasy-order",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "256",
+  "memory": "512",
+  "executionRoleArn": "<EXECUTION_ROLE_ARN>",
+  "taskRoleArn": "<TASK_ROLE_ARN>",
+  "containerDefinitions": [
+    {
+      "name": "order-service",
+      "image": "<IMAGE1_NAME>",
+      "essential": true,
+      "portMappings": [
+        { 
+          "containerPort": 8080, 
+          "protocol": "tcp" 
+         }
+       ],
+
+      "environment": [
+     {
+       "name": "TABLE_NAME",
+       "value": "shopeasy-dev-main"
+      },
+     {
+       "name": "AWS_REGION",
+       "value": "<AWS_REGION>"
+      },
+     {
+       "name": "ALLOWED_ORIGIN",
+       "value": "*"
+      },
+     {
+       "name": "PORT",
+       "value": "8080"
+      }
+      ],
+
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/shopeasy/shopeasy-dev-order",
+          "awslogs-region": "<AWS_REGION>",
+          "awslogs-stream-prefix": "order"
+        }
+      }
+    }
+  ]
+}
