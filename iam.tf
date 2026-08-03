@@ -101,12 +101,84 @@ resource "aws_iam_role_policy" "ecs_task" {
         Action   = ["s3:ListBucket"]
         Resource = aws_s3_bucket.assets.arn
       }
-     
+
     ]
   })
 }
 
+# =============================================================================
+# 3. CodeBuild Service Role
+# =============================================================================
+resource "aws_iam_role" "codebuild" {
+  name = "${local.name_prefix}-codebuild-role"
 
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect = "Allow"
+      Principal = {
+        Service = "codebuild.amazonaws.com"
+      }
+      Action = "sts:AssumeRole"
+    }]
+  })
+
+  tags = merge(local.common_tags, {
+    Name = "${local.name_prefix}-codebuild-role"
+  })
+}
+
+resource "aws_iam_role_policy" "codebuild" {
+  name = "${local.name_prefix}-codebuild-policy"
+  role = aws_iam_role.codebuild.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "CloudWatchLogs"
+        Effect = "Allow"
+        Action = [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ]
+        Resource = "arn:aws:logs:${var.aws_region}:${data.aws_caller_identity.current.account_id}:log-group:/aws/codebuild/*"
+      },
+      {
+        Sid    = "ECRAccess"
+        Effect = "Allow"
+        Action = [
+          "ecr:GetAuthorizationToken",
+          "ecr:BatchCheckLayerAvailability",
+          "ecr:GetDownloadUrlForLayer",
+          "ecr:BatchGetImage",
+          "ecr:PutImage",
+          "ecr:InitiateLayerUpload",
+          "ecr:UploadLayerPart",
+          "ecr:CompleteLayerUpload"
+        ]
+        Resource = "*"
+      },
+      {
+        Sid    = "S3Artifacts"
+        Effect = "Allow"
+        Action = [
+          "s3:GetObject",
+          "s3:GetObjectVersion",
+          "s3:PutObject"
+        ]
+        Resource = "${aws_s3_bucket.pipeline_artifacts.arn}/*"
+      },
+      {
+        Sid      = "S3ArtifactsList"
+        Effect   = "Allow"
+        Action   = ["s3:ListBucket"]
+        Resource = aws_s3_bucket.pipeline_artifacts.arn
+      }
+    ]
+  })
+}
 
 # =============================================================================
 # 6. Microsoft Entra ID (Azure AD) SAML Federation

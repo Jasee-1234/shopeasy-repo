@@ -20,10 +20,10 @@ resource "aws_lb" "product" {
   security_groups    = [aws_security_group.alb.id]
   subnets            = aws_subnet.public[*].id
 
-enable_deletion_protection = false
+  enable_deletion_protection = false
 
   tags = merge(local.common_tags, {
-    Name        = "${local.name_prefix}-product-alb"
+    Name = "${local.name_prefix}-product-alb"
   })
 }
 
@@ -38,11 +38,11 @@ resource "aws_lb" "order" {
   security_groups    = [aws_security_group.alb.id]
   subnets            = aws_subnet.public[*].id
 
-enable_deletion_protection = false
+  enable_deletion_protection = false
 
   tags = merge(local.common_tags, {
-    Name        = "${local.name_prefix}-order-alb"
-   })
+    Name = "${local.name_prefix}-order-alb"
+  })
 }
 
 # =============================================================================
@@ -66,8 +66,8 @@ resource "aws_lb_target_group" "product" {
   }
 
   tags = merge(local.common_tags, {
-    Name        = "${local.name_prefix}-product-tg"
-   })
+    Name = "${local.name_prefix}-product-tg"
+  })
 }
 
 # =============================================================================
@@ -91,7 +91,7 @@ resource "aws_lb_target_group" "order" {
   }
 
   tags = merge(local.common_tags, {
-    Name        = "${local.name_prefix}-order-tg"
+    Name = "${local.name_prefix}-order-tg"
   })
 }
 

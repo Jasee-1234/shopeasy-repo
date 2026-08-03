@@ -5,7 +5,7 @@
 # =============================================================================
 # ECS Cluster
 # =============================================================================
-resource "aws_ecs_cluster" "primary" { 
+resource "aws_ecs_cluster" "primary" {
   name = "${local.name_prefix}-cluster"
 
   setting {
@@ -91,7 +91,7 @@ resource "aws_ecs_task_definition" "product" {
         "awslogs-group"         = aws_cloudwatch_log_group.product.name
         "awslogs-region"        = var.aws_region
         "awslogs-stream-prefix" = "product"
-        
+
       }
     }
   }])
@@ -150,7 +150,7 @@ resource "aws_ecs_task_definition" "order" {
         "awslogs-group"         = aws_cloudwatch_log_group.order.name
         "awslogs-region"        = var.aws_region
         "awslogs-stream-prefix" = "order"
-        
+
       }
     }
   }])
