@@ -5,5 +5,6 @@ Resources:
       Properties:
         TaskDefinition: <TASK_DEFINITION>
         LoadBalancerInfo:
-          ContainerName: "order-service"
+          ContainerName: "order"
           ContainerPort: 8080
+        PlatformVersion: "LATEST"

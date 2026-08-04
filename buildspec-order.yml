@@ -36,7 +36,7 @@ phases:
       - sed -i "s|<EXECUTION_ROLE_ARN>|$EXECUTION_ROLE_ARN|g; s|<TASK_ROLE_ARN>|$TASK_ROLE_ARN|g; s|<AWS_REGION>|$AWS_DEFAULT_REGION|g" services/order-service/taskdef.json
 
       # Copy the 3 required files to the root for the artifact
-      - cp imageDetail.json services/order-service/taskdef.json services/order-service/appspec.yml .
+      - cp imageDetail.json services/order-service/taskdef.json services/order/appspec.yaml .
       - echo "Build completed on $(date)"
       - cat taskdef.json
 
