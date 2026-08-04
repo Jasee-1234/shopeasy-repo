@@ -54,10 +54,6 @@ resource "aws_ecs_task_definition" "product" {
   execution_role_arn       = aws_iam_role.ecs_task_execution.arn
   task_role_arn            = aws_iam_role.ecs_task.arn
 
-    deployment_controller {
-    type = "CODE_DEPLOY"
-  }
-
   container_definitions = jsonencode([{
     name      = "product"
     image     = "${aws_ecr_repository.product.repository_url}:latest"
@@ -116,10 +112,6 @@ resource "aws_ecs_task_definition" "order" {
   memory                   = var.task_memory
   execution_role_arn       = aws_iam_role.ecs_task_execution.arn
   task_role_arn            = aws_iam_role.ecs_task.arn
-
-    deployment_controller {
-    type = "CODE_DEPLOY"
-  }
 
   container_definitions = jsonencode([{
     name      = "order"
@@ -198,7 +190,7 @@ resource "aws_ecs_service" "product" {
 
   # Ignore desired_count changes made by auto-scaling
   lifecycle {
-    ignore_changes = [desired_count]
+    ignore_changes = [desired_count, task_definition, load_balancer]
   }
 }
 
@@ -232,7 +224,7 @@ resource "aws_ecs_service" "order" {
 
   # Ignore desired_count changes made by auto-scaling
   lifecycle {
-    ignore_changes = [desired_count]
+    ignore_changes = [desired_count, task_definition, load_balancer]
   }
 }
 
