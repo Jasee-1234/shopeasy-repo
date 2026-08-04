@@ -181,6 +181,140 @@ resource "aws_iam_role_policy" "codebuild" {
 }
 
 # =============================================================================
+# 4. CodePipeline Service Role
+# =============================================================================
+resource "aws_iam_role" "codepipeline" {
+  name = "${local.name_prefix}-codepipeline-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect = "Allow"
+      Principal = {
+        Service = "codepipeline.amazonaws.com"
+      }
+      Action = "sts:AssumeRole"
+    }]
+  })
+
+  tags = merge(local.common_tags, {
+    Name = "${local.name_prefix}-codepipeline-role"
+  })
+}
+
+resource "aws_iam_role_policy" "codepipeline" {
+  name = "${local.name_prefix}-codepipeline-policy"
+  role = aws_iam_role.codepipeline.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "S3Artifacts"
+        Effect = "Allow"
+        Action = [
+          "s3:GetObject",
+          "s3:GetObjectVersion",
+          "s3:PutObject",
+          "s3:GetBucketVersioning"
+        ]
+        Resource = [
+          aws_s3_bucket.pipeline_artifacts.arn,
+          "${aws_s3_bucket.pipeline_artifacts.arn}/*"
+        ]
+      },
+      {
+        Sid    = "CodeBuildStart"
+        Effect = "Allow"
+        Action = [
+          "codebuild:BatchGetBuilds",
+          "codebuild:StartBuild"
+        ]
+        Resource = [
+          aws_codebuild_project.product.arn,
+          aws_codebuild_project.order.arn
+        ]
+      },
+      {
+        Sid    = "CodeDeploy"
+        Effect = "Allow"
+        Action = [
+          "codedeploy:CreateDeployment",
+          "codedeploy:GetDeployment",
+          "codedeploy:GetApplication",
+          "codedeploy:GetApplicationRevision",
+          "codedeploy:RegisterApplicationRevision",
+          "codedeploy:GetDeploymentConfig",
+          "codedeploy:GetDeploymentGroup"
+        ]
+        Resource = "*"
+      },
+      {
+        Sid    = "ECSUpdate"
+        Effect = "Allow"
+        Action = [
+          "ecs:DescribeServices",
+          "ecs:DescribeTaskDefinition",
+          "ecs:DescribeTasks",
+          "ecs:ListTasks",
+          "ecs:RegisterTaskDefinition",
+          "ecs:UpdateService"
+        ]
+        Resource = "*"
+      },
+      {
+        Sid    = "PassRole"
+        Effect = "Allow"
+        Action = "iam:PassRole"
+        Resource = [
+          aws_iam_role.ecs_task_execution.arn,
+          aws_iam_role.ecs_task.arn
+        ]
+      },
+      {
+        Sid      = "SNS"
+        Effect   = "Allow"
+        Action   = ["sns:Publish"]
+        Resource = aws_sns_topic.alerts.arn
+      },
+      {
+        Sid      = "CodeStarConnection"
+        Effect   = "Allow"
+        Action   = ["codestar-connections:UseConnection"]
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+# =============================================================================
+# 5. CodeDeploy Service Role (for ECS Blue/Green)
+# =============================================================================
+resource "aws_iam_role" "codedeploy" {
+  name = "${local.name_prefix}-codedeploy-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect = "Allow"
+      Principal = {
+        Service = "codedeploy.amazonaws.com"
+      }
+      Action = "sts:AssumeRole"
+    }]
+  })
+
+  tags = merge(local.common_tags, {
+    Name = "${local.name_prefix}-codedeploy-role"
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "codedeploy" {
+  role       = aws_iam_role.codedeploy.name
+  policy_arn = "arn:aws:iam::aws:policy/AWSCodeDeployRoleForECS"
+}
+
+# =============================================================================
 # 6. Microsoft Entra ID (Azure AD) SAML Federation
 # Place the metadata XML file (downloaded from Azure Enterprise Application)
 # next to this Terraform code and name it entra-id-metadata.xml

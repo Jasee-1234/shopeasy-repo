@@ -29,7 +29,7 @@ resource "aws_codedeploy_deployment_group" "product" {
   }
 
   ecs_service {
-    cluster_name = aws_ecs_cluster.main.name
+    cluster_name = aws_ecs_cluster.primary.name
     service_name = aws_ecs_service.product.name
   }
 
@@ -80,7 +80,7 @@ resource "aws_codedeploy_deployment_group" "order" {
   }
 
   ecs_service {
-    cluster_name = aws_ecs_cluster.main.name
+    cluster_name = aws_ecs_cluster.primary.name
     service_name = aws_ecs_service.order.name
   }
 
