@@ -100,6 +100,21 @@ resource "aws_iam_role_policy" "ecs_task" {
         Effect   = "Allow"
         Action   = ["s3:ListBucket"]
         Resource = aws_s3_bucket.assets.arn
+      },
+ {
+        Sid    = "ApplicationLogs"
+        Effect = "Allow"
+        Action = [
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ]
+        Resource = "arn:aws:logs:${var.aws_region}:${data.aws_caller_identity.current.account_id}:log-group:/ecs/${local.name_prefix}*:*"
+      },
+      {
+        Sid      = "SNSPublish"
+        Effect   = "Allow"
+        Action   = ["sns:Publish"]
+        Resource = aws_sns_topic.alerts.arn
       }
 
     ]
