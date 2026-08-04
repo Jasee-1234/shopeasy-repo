@@ -101,7 +101,7 @@ resource "aws_iam_role_policy" "ecs_task" {
         Action   = ["s3:ListBucket"]
         Resource = aws_s3_bucket.assets.arn
       },
- {
+      {
         Sid    = "ApplicationLogs"
         Effect = "Allow"
         Action = [

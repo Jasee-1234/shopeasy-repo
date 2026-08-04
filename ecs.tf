@@ -54,6 +54,10 @@ resource "aws_ecs_task_definition" "product" {
   execution_role_arn       = aws_iam_role.ecs_task_execution.arn
   task_role_arn            = aws_iam_role.ecs_task.arn
 
+    deployment_controller {
+    type = "CODE_DEPLOY"
+  }
+
   container_definitions = jsonencode([{
     name      = "product"
     image     = "${aws_ecr_repository.product.repository_url}:latest"
@@ -112,6 +116,10 @@ resource "aws_ecs_task_definition" "order" {
   memory                   = var.task_memory
   execution_role_arn       = aws_iam_role.ecs_task_execution.arn
   task_role_arn            = aws_iam_role.ecs_task.arn
+
+    deployment_controller {
+    type = "CODE_DEPLOY"
+  }
 
   container_definitions = jsonencode([{
     name      = "order"
