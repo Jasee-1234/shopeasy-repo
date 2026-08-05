@@ -2,47 +2,36 @@ version: 0.2
 
 phases:
   install:
+    runtime-versions:
+      python: 3.12
     commands:
-      - echo Installing dependencies...
-      - pip install -q -r services/order/requirements.txt pytest --break-system-packages || true
+      - pip install -r services/order/requirements.txt
+      - pip install pytest
 
   pre_build:
     commands:
-      - echo Logging in to Amazon ECR...
+      - cd services/order && python -m pytest tests/ -v || true
+      - cd $CODEBUILD_SRC_DIR
       - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
       - IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-8)
-      - echo "Image tag is $IMAGE_TAG"
-
-      # Optional: run tests if you have them
-      # - cd services/order-service && python -m pytest tests/ -v && cd ../..
 
   build:
     commands:
-      - echo Building the order-service Docker image...
-      - cd services/order-service
-      - docker build -t $ECR_REPO_URL:$IMAGE_TAG -t $ECR_REPO_URL:latest .
-      - cd ../..
+      - docker build -t $ECR_REPO_URL:$IMAGE_TAG -t $ECR_REPO_URL:latest -f services/order/Dockerfile services/order
 
   post_build:
     commands:
-      - echo Pushing image to ECR...
       - docker push $ECR_REPO_URL:$IMAGE_TAG
       - docker push $ECR_REPO_URL:latest
-
-      - echo Writing imageDetail.json...
-      - printf '{"ImageURI":"%s"}' $ECR_REPO_URL:$IMAGE_TAG > imageDetail.json
-
-      - echo Updating taskdef.json with role ARNs and region...
-      - sed -i "s|<EXECUTION_ROLE_ARN>|$EXECUTION_ROLE_ARN|g; s|<TASK_ROLE_ARN>|$TASK_ROLE_ARN|g; s|<AWS_REGION>|$AWS_DEFAULT_REGION|g" services/order-service/taskdef.json
-
-      # Copy the 3 required files to the root for the artifact
-      - cp imageDetail.json services/order-service/taskdef.json services/order/appspec.yaml .
-      - echo "Build completed on $(date)"
-      - cat taskdef.json
+      - printf '{"ImageURI":"%s"}' "$ECR_REPO_URL:$IMAGE_TAG" > imageDetail.json
+      - sed -i "s|<EXECUTION_ROLE_ARN>|$EXECUTION_ROLE_ARN|g; s|<TASK_ROLE_ARN>|$TASK_ROLE_ARN|g; s|<AWS_REGION>|$AWS_DEFAULT_REGION|g" services/order/taskdef.json
+      - cp services/order/taskdef.json .
+      - cp services/order/appspec.yaml appspec.yml
+      - cat imageDetail.json
 
 artifacts:
   files:
     - imageDetail.json
     - taskdef.json
     - appspec.yml
-  base-directory: .
+  discard-paths: yes

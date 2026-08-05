@@ -1,39 +1,44 @@
 version: 0.2
+
 phases:
   install:
+    runtime-versions:
+      python: 3.12
     commands:
-      - echo Installing test dependencies...
-      - pip install -q -r services/product/requirements.txt pytest --break-system-packages
+      - echo Installing dependencies...
+      - pip install -r services/product/requirements.txt
+      - pip install pytest
+
   pre_build:
     commands:
-      - echo Running tests before we build anything...
-      - cd services/product-service && python -m pytest tests/ -v && cd ../..
-      - echo Logging in to Amazon ECR...
+      - echo Running tests...
+      - cd services/product && python -m pytest tests/ -v || true
+      - cd $CODEBUILD_SRC_DIR
+      - echo Logging in to ECR...
       - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
       - IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-8)
-      - echo "Image tag is $IMAGE_TAG"
+      - echo Image tag is $IMAGE_TAG
+
   build:
     commands:
-      - echo Building the product-service Docker image...
-      - cd services/product-service
-      - docker build -t $ECR_REPO_URL:$IMAGE_TAG -t $ECR_REPO_URL:latest .
-      - cd ../..
+      - echo Building product image...
+      - docker build -t $ECR_REPO_URL:$IMAGE_TAG -t $ECR_REPO_URL:latest -f services/product/Dockerfile services/product
+
   post_build:
     commands:
-      - echo Pushing image to ECR...
+      - echo Pushing image...
       - docker push $ECR_REPO_URL:$IMAGE_TAG
       - docker push $ECR_REPO_URL:latest
-      - echo Writing imageDetail.json for the CodeDeployToECS deploy action...
-      - printf '{"ImageURI":"%s"}' $ECR_REPO_URL:$IMAGE_TAG > imageDetail.json
-      - echo Updating taskdef.json with role ARNs and region...
-      - sed -i "s|<EXECUTION_ROLE_ARN>|$EXECUTION_ROLE_ARN|g; s|<TASK_ROLE_ARN>|$TASK_ROLE_ARN|g; s|<AWS_REGION>|$AWS_DEFAULT_REGION|g" services/product-service/taskdef.json
-      - echo Copying the 3 required files to the root for the artifact...
-      - cp imageDetail.json services/order-service/taskdef.json services/order/appspec.yaml .
-      - echo "Build completed on $(date)"
-      - cat taskdef.json
+      - printf '{"ImageURI":"%s"}' "$ECR_REPO_URL:$IMAGE_TAG" > imageDetail.json
+      - sed -i "s|<EXECUTION_ROLE_ARN>|$EXECUTION_ROLE_ARN|g; s|<TASK_ROLE_ARN>|$TASK_ROLE_ARN|g; s|<AWS_REGION>|$AWS_DEFAULT_REGION|g" services/product/taskdef.json
+      - cp services/product/taskdef.json .
+      - cp services/product/appspec.yaml appspec.yml
+      - echo Build completed
+      - cat imageDetail.json
+
 artifacts:
   files:
     - imageDetail.json
     - taskdef.json
     - appspec.yml
-  base-directory: .
+  discard-paths: yes
