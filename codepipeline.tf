@@ -71,3 +71,53 @@ resource "aws_codepipeline" "main" {
     Name = "${local.name_prefix}-pipeline"
   })
 }
+
+ # ----- Stage 3: Deploy -----
+  stage {
+    name = "Deploy"
+
+    action {
+      name            = "Deploy_Product"
+      category        = "Deploy"
+      owner           = "AWS"
+      provider        = "CodeDeployToECS"
+      version         = "1"
+      input_artifacts = ["product_build_output"]
+
+      configuration = {
+        ApplicationName                = aws_codedeploy_app.product.name
+        DeploymentGroupName            = aws_codedeploy_deployment_group.product.deployment_group_name
+        TaskDefinitionTemplateArtifact = "product_build_output"
+        TaskDefinitionTemplatePath     = "taskdef.json"
+        AppSpecTemplateArtifact        = "product_build_output"
+        AppSpecTemplatePath            = "appspec.yml"
+        Image1ArtifactName             = "product_build_output"
+        Image1ContainerName            = "product"
+      }
+    }
+
+    action {
+      name            = "Deploy_Order"
+      category        = "Deploy"
+      owner           = "AWS"
+      provider        = "CodeDeployToECS"
+      version         = "1"
+      input_artifacts = ["order_build_output"]
+
+      configuration = {
+        ApplicationName                = aws_codedeploy_app.order.name
+        DeploymentGroupName            = aws_codedeploy_deployment_group.order.deployment_group_name
+        TaskDefinitionTemplateArtifact = "order_build_output"
+        TaskDefinitionTemplatePath     = "taskdef.json"
+        AppSpecTemplateArtifact        = "order_build_output"
+        AppSpecTemplatePath            = "appspec.yml"
+        Image1ArtifactName             = "order_build_output"
+        Image1ContainerName            = "order"
+      }
+    }
+  }
+
+  tags = merge(local.common_tags, {
+    Name = "${local.name_prefix}-pipeline"
+  })
+}
