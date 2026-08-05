@@ -1,5 +1,5 @@
 # =============================================================================
-# codepipeline.tf — Source → Parallel Build (Deploy stage added later)
+# codepipeline.tf — Source → Parallel Build → Parallel Deploy
 # =============================================================================
 
 resource "aws_codestarconnections_connection" "github" {
@@ -67,12 +67,6 @@ resource "aws_codepipeline" "main" {
     }
   }
 
-  tags = merge(local.common_tags, {
-    Name = "${local.name_prefix}-pipeline"
-  })
-}
-
- # ----- Stage 3: Deploy -----
   stage {
     name = "Deploy"
 

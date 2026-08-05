@@ -49,20 +49,35 @@ resource "aws_lb" "order" {
 # Product Target Group
 # =============================================================================
 
-resource "aws_lb_target_group" "product" {
-  name        = "${local.name_prefix}-product-tg"
-  port        = var.container_port
-  protocol    = "HTTP"
-  vpc_id      = aws_vpc.main.id
+resource "aws_lb_target_group" "product_blue" {
+
+  name = "${local.name_prefix}-product-blue"
+
+  port     = var.container_port
+  protocol = "HTTP"
+  vpc_id   = aws_vpc.main.id
+
   target_type = "ip"
 
   health_check {
-    path                = "/health"
-    healthy_threshold   = 2
-    unhealthy_threshold = 3
-    timeout             = 5
-    interval            = 30
-    matcher             = "200"
+    path = "/health"
+  }
+
+}
+
+
+resource "aws_lb_target_group" "product_green" {
+
+  name = "${local.name_prefix}-product-green"
+
+  port     = var.container_port
+  protocol = "HTTP"
+  vpc_id   = aws_vpc.main.id
+
+  target_type = "ip"
+
+  health_check {
+    path = "/health"
   }
 
   tags = merge(local.common_tags, {
@@ -74,21 +89,24 @@ resource "aws_lb_target_group" "product" {
 # Order Target Group
 # =============================================================================
 
-resource "aws_lb_target_group" "order" {
-  name        = "${local.name_prefix}-order-tg"
+resource "aws_lb_target_group" "order_blue" {
+
+  name = "${local.name_prefix}-order-blue"
+
   port        = var.container_port
   protocol    = "HTTP"
   vpc_id      = aws_vpc.main.id
   target_type = "ip"
+}
 
-  health_check {
-    path                = "/health"
-    healthy_threshold   = 2
-    unhealthy_threshold = 3
-    timeout             = 5
-    interval            = 30
-    matcher             = "200"
-  }
+resource "aws_lb_target_group" "order_green" {
+
+  name = "${local.name_prefix}-order-green"
+
+  port        = var.container_port
+  protocol    = "HTTP"
+  vpc_id      = aws_vpc.main.id
+  target_type = "ip"
 
   tags = merge(local.common_tags, {
     Name = "${local.name_prefix}-order-tg"
@@ -105,7 +123,7 @@ resource "aws_lb_listener" "product" {
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.product.arn
+    target_group_arn = aws_lb_target_group.product_blue.arn
   }
 }
 
@@ -119,6 +137,6 @@ resource "aws_lb_listener" "order" {
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.order.arn
+    target_group_arn = aws_lb_target_group.order_blue.arn
   }
 }

@@ -170,6 +170,10 @@ resource "aws_ecs_service" "product" {
   desired_count   = var.desired_count
   launch_type     = "FARGATE"
 
+  deployment_controller {
+    type = "CODE_DEPLOY"
+  }
+
   network_configuration {
     subnets          = aws_subnet.public[*].id
     security_groups  = [aws_security_group.ecs.id]
@@ -177,7 +181,7 @@ resource "aws_ecs_service" "product" {
   }
 
   load_balancer {
-    target_group_arn = aws_lb_target_group.product.arn
+    target_group_arn = aws_lb_target_group.product_blue.arn
     container_name   = "product"
     container_port   = var.container_port
   }
@@ -204,6 +208,10 @@ resource "aws_ecs_service" "order" {
   desired_count   = var.desired_count
   launch_type     = "FARGATE"
 
+  deployment_controller {
+    type = "CODE_DEPLOY"
+  }
+
   network_configuration {
     subnets          = aws_subnet.public[*].id
     security_groups  = [aws_security_group.ecs.id]
@@ -211,7 +219,7 @@ resource "aws_ecs_service" "order" {
   }
 
   load_balancer {
-    target_group_arn = aws_lb_target_group.order.arn
+    target_group_arn = aws_lb_target_group.order_blue.arn
     container_name   = "order"
     container_port   = var.container_port
   }

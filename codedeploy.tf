@@ -39,10 +39,11 @@ resource "aws_codedeploy_deployment_group" "product" {
         listener_arns = [aws_lb_listener.product.arn]
       }
       target_group {
-        name = aws_lb_target_group.product.name
+        name = aws_lb_target_group.product_blue.name
       }
+
       target_group {
-        name = aws_lb_target_group.product.name
+        name = aws_lb_target_group.product_green.name
       }
     }
   }
@@ -90,10 +91,11 @@ resource "aws_codedeploy_deployment_group" "order" {
         listener_arns = [aws_lb_listener.order.arn]
       }
       target_group {
-        name = aws_lb_target_group.order.name
+        name = aws_lb_target_group.order_blue.name
       }
+
       target_group {
-        name = aws_lb_target_group.order.name
+        name = aws_lb_target_group.order_green.name
       }
     }
   }
