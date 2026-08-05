@@ -4,7 +4,7 @@ phases:
   install:
     commands:
       - echo Installing dependencies...
-      - pip install -q -r services/order-service/requirements.txt pytest --break-system-packages || true
+      - pip install -q -r services/order/requirements.txt pytest --break-system-packages || true
 
   pre_build:
     commands:

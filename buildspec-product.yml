@@ -3,7 +3,7 @@ phases:
   install:
     commands:
       - echo Installing test dependencies...
-      - pip install -q -r services/product-service/requirements.txt pytest --break-system-packages
+      - pip install -q -r services/product/requirements.txt pytest --break-system-packages
   pre_build:
     commands:
       - echo Running tests before we build anything...
