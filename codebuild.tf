@@ -1,5 +1,6 @@
 # =============================================================================
 # CodeBuild Project - Order Service
+# Source type CODEPIPELINE = Pipeline feeds the source zip
 # =============================================================================
 resource "aws_codebuild_project" "order" {
   name          = "${local.name_prefix}-order-build"
@@ -64,7 +65,7 @@ resource "aws_codebuild_project" "product" {
     image                       = "aws/codebuild/standard:7.0"
     type                        = "LINUX_CONTAINER"
     image_pull_credentials_type = "CODEBUILD"
-    privileged_mode             = true
+    privileged_mode             = true # required for Docker build
 
     environment_variable {
       name  = "AWS_ACCOUNT_ID"

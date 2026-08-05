@@ -36,18 +36,22 @@ resource "aws_sns_topic_policy" "alerts" {
   })
 }
 
+# -----------------------------------------------------------------------------
+# TEMPORARILY DISABLED — enable after aws_codepipeline.main exists
+# -----------------------------------------------------------------------------
+
 # Optional – notify on pipeline success/failure
-resource "aws_codestarnotifications_notification_rule" "pipeline" {
-  name        = "${local.name_prefix}-pipeline-notifications"
-  resource    = aws_codepipeline.main.arn
-  detail_type = "BASIC"
+# resource "aws_codestarnotifications_notification_rule" "pipeline" {
+# name        = "${local.name_prefix}-pipeline-notifications"
+# resource    = aws_codepipeline.main.arn
+# detail_type = "BASIC"
 
-  event_type_ids = [
-    "codepipeline-pipeline-pipeline-execution-succeeded",
-    "codepipeline-pipeline-pipeline-execution-failed",
-  ]
+# event_type_ids = [
+#   "codepipeline-pipeline-pipeline-execution-succeeded",
+#   "codepipeline-pipeline-pipeline-execution-failed",
+# ]
 
-  target {
-    address = aws_sns_topic.alerts.arn
-  }
-}
+# target {
+#   address = aws_sns_topic.alerts.arn
+# }
+#}

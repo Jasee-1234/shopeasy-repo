@@ -46,25 +46,4 @@ github_branch = "main"
 # =============================================================================
 alert_email = "jaseew59@gmail.com"
 
-# =============================================================================
-# AZURE
-# =============================================================================
-azure_tenant_id = "236f13ee-15cf-4f6a-934e-90c31d983022" # replace this with real Tenant Id
-# Azure Portal > Microsoft Entra ID > Overview > Tenant ID
-
-
-# ================================= Google Cloud =================================
-gcp_project_id = "shopeasy-backup"
-# replaced with google project id i.e. gcp_project_id = "shopeasy-backup"
-# Google Cloud Console > top nav project dropdown > Project ID (not name)
-
-gcp_region = "us-central1"
-
-
-
-# project_name    = "shopeasy-backup"
-# environment     = "dev"
-# aws_region      = "us-east-1"
-# gcp_region      = "us-central1"
-# github_branch   = "main"
 

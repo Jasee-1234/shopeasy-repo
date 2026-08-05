@@ -132,21 +132,3 @@ variable "image_tag" {
   default     = "latest"
 }
 
-# --- Azure Entra ID ---
-
-variable "azure_tenant_id" {
-  description = "Azure AD tenant ID (Azure Portal > Microsoft Entra ID > Overview > Tenant ID). Required by the azuread 	         provider even though authentication itself comes from `az login`."
-  type        = string
-}
-
-# --- Google Cloud ---
-variable "gcp_project_id" {
-  description = "GCP project ID that will hold the backup storage bucket"
-  type        = string
-}
-
-variable "gcp_region" {
-  description = "GCP region for the backup bucket"
-  type        = string
-  default     = "us-central1"
-}

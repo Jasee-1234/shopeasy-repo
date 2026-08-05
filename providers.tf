@@ -34,14 +34,7 @@ terraform {
       source  = "hashicorp/aws"
       version = "~> 5.0"
     }
-    azuread = {
-      source  = "hashicorp/azuread"
-      version = "~> 2.0"
-    }
-    google = {
-      source  = "hashicorp/google"
-      version = "~> 5.0"
-    }
+
     random = {
       source  = "hashicorp/random"
       version = "~> 3.6"
@@ -72,36 +65,3 @@ provider "aws" {
   }
 }
 
-# =============================================================================
-# Azure Active Directory Provider (Entra ID)
-# Tells Terraform to talk to Microsoft Azure
-# specifically for identity and access management
-#
-# We only use Azure for ONE thing in this project:
-# Entra ID SAML federation so engineers can log into
-# AWS Console using their Microsoft work accounts
-#
-# tenant_id: shopeasy unique Azure directory ID
-# Every Microsoft 365 / Azure account has one
-# It looks like: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-# =============================================================================
-provider "azuread" {
-  tenant_id = var.azure_tenant_id
-}
-
-# =============================================================================
-# Google Clouod Provider
-# Tells Terraform to talk to Google Cloud Platform
-#
-# We use GCP for ONE thing in this project:
-# Cloud Storage bucket as an offsite backup destination
-# for ShopEasy's critical application data
-#
-# project: your GCP project ID (e.g. "shopeasy-backup")
-# region: where your GCP resources are created
-# us-central1 = Iowa, USA data centres
-# =============================================================================
-provider "google" {
-  project = var.gcp_project_id
-  region  = var.gcp_region
-}
