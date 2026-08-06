@@ -158,9 +158,9 @@ sequenceDiagram
 
 ## Blue/green deployment (zero downtime)
 
-## Blue/green deployment (zero downtime)
-
-![Blue/green deployment flow with cutover and rollback](documentation/system-architecture/CodeDeploy-BlueGreen-Cutover-CloudWatch-Gated-Rollback.png)
+<img src="documentation/system-architecture/CodeDeploy-BlueGreen-Cutover-CloudWatch-Gated-Rollback.png"
+     alt="Blue/green deployment"
+     width="60%">
 
 ```
 CodeDeploy stands up the new task set (green) alongside the running one (blue), health-checks it behind the same target group, and only shifts traffic once green is confirmed healthy. Blue is kept running for a configurable rollback window — if green starts failing post-cutover, CodeDeploy shifts traffic back to blue automatically. Nothing is torn down until that window closes, so a bad deploy never causes a customer-facing outage.
