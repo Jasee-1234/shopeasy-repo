@@ -59,6 +59,7 @@ A few decisions worth calling out, because being able to explain *why*, not just
 
 ![Blue/green deployment flow with cutover and rollback](documentation/system-architecture/shopeasy-multicloud-architecture-diagram1.png)
 
+<img src="path/to/image.png" width="60%">
 \---
 
 ## Delivery lifecycle
