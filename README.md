@@ -57,8 +57,6 @@ A few decisions worth calling out, because being able to explain *why*, not just
 
 **Read this diagram top to bottom:** a client request hits CloudFront, which routes into the VPC to one of two ALBs, each fronting its own ECS Fargate service, both sharing a DynamoDB table. Microsoft EntraID federates operator identity into the account separately from the client traffic path. DynamoDB is exported to Google Cloud Storage on a schedule for disaster recovery.
 
-![CloudFront lifecycle](documentation/system-architecture/shopeasy-multicloud-architecture-diagram1.png)
-
 <img src="documentation/system-architecture/shopeasy-multicloud-architecture-diagram1.png" width="90%">
 
 ## Delivery lifecycle
