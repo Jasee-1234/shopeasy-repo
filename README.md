@@ -9,8 +9,8 @@ This project was built as a capstone in cloud engineering, structured the way a 
 ## Table of contents
 
 1. [Overview](#overview)
-2. [Why this architecture](#Why this architecture)
-3. [Architecture diagram](#Architecture diagram)
+2. [Why this architecture](#Why-this-architecture)
+3. [Architecture diagram](#Architecture-diagram)
 4. [Delivery lifecycle](#delivery-lifecycle)
 5. [Tech stack](#tech-stack)
 6. [Repository structure](#repository-structure)
@@ -21,7 +21,7 @@ This project was built as a capstone in cloud engineering, structured the way a 
 11. [Identity federation (Microsoft EntraID)](#identity-federation-microsoft-entraid)
 12. [Disaster recovery with GCP-backup](#disaster-recovery)
 13. [Testing and validation](#testing-and-validation)
-14.  [Deployment guide](#Deployment guide)
+14.  [Deployment guide](#Deployment-guide)
 15. [Author](#author)
 
 \---
