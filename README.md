@@ -58,7 +58,7 @@ A few decisions worth calling out, because being able to explain *why*, not just
 **Read this diagram top to bottom:** a client request hits CloudFront, which routes into the VPC to one of two ALBs, each fronting its own ECS Fargate service, both sharing a DynamoDB table. Microsoft EntraID federates operator identity into the account separately from the client traffic path. DynamoDB is exported to Google Cloud Storage on a schedule for disaster recovery.
 
 <p align="center">
-<img src="documentation/system-architecture/shopeasy-multicloud-architecture-diagram1.png" width="90%">
+  <img src="https://raw.githubusercontent.com/Jasee-1234/shopeasy-repo/main/documentation/system-architecture/shopeasy-multicloud-architecture-diagram1.png" width="90%">
 </p>
 
 ## Delivery lifecycle
@@ -134,7 +134,7 @@ sequenceDiagram
 
 ## Blue/green deployment (zero downtime)
 <p align="center">
-<img src="documentation/system-architecture/CodeDeploy-BlueGreen-Cutover-CloudWatch-Gated-Rollback.png" width="60%">
+  <img src="https://raw.githubusercontent.com/Jasee-1234/shopeasy-repo/main/documentation/system-architecture/CodeDeploy-BlueGreen-Cutover-CloudWatch-Gated-Rollback.png" width="60%">
 </p>
 
 CodeDeploy stands up the new task set (green) alongside the running one (blue), health-checks it behind the same target group, and only shifts traffic once green is confirmed healthy. Blue is kept running for a configurable rollback window — if green starts failing post-cutover, CodeDeploy shifts traffic back to blue automatically. Nothing is torn down until that window closes, so a bad deploy never causes a customer-facing outage.
