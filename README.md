@@ -9,8 +9,8 @@ This project was built as a capstone in cloud engineering, structured the way a 
 ## Table of contents
 
 1. [Overview](#overview)
-2. [Why this architecture]
-3. [Architecture diagram]
+2. [Why this architecture](#Why this architecture)
+3. [Architecture diagram](#Architecture diagram)
 4. [Delivery lifecycle](#delivery-lifecycle)
 5. [Tech stack](#tech-stack)
 6. [Repository structure](#repository-structure)
@@ -21,7 +21,7 @@ This project was built as a capstone in cloud engineering, structured the way a 
 11. [Identity federation (Microsoft EntraID)](#identity-federation-microsoft-entraid)
 12. [Disaster recovery with GCP-backup](#disaster-recovery)
 13. [Testing and validation](#testing-and-validation)
-14.  [Deployment guide]
+14.  [Deployment guide](#Deployment guide)
 15. [Author](#author)
 
 \---
@@ -53,36 +53,11 @@ A few decisions worth calling out, because being able to explain *why*, not just
 
 ## Architecture diagram
 
-```mermaid
-flowchart TB
-    Client(\[Client / browser])
-    Entra\[Microsoft EntraID<br/>SSO, MFA]
-    CF\[Amazon CloudFront<br/>Global edge CDN]
 
-    subgraph AWS\["AWS — Shopeasy production platform (VPC 10.0.0.0/16)"]
-        subgraph AZA\["Public subnet — AZ-a"]
-            ALB1\[Product ALB]
-            ECS1\[Product ECS<br/>Fargate]
-            ALB1 --> ECS1
-        end
-        subgraph AZB\["Public subnet — AZ-b"]
-            ALB2\[Order ALB]
-            ECS2\[Order ECS<br/>Fargate]
-            ALB2 --> ECS2
-        end
-        DDB\[(DynamoDB)]
-        ECS1 --> DDB
-        ECS2 --> DDB
-    end
-
-    GCS\[(Google Cloud Storage<br/>DR backup target)]
-
-    Client --> CF --> AWS
-    Entra -. SAML federation .-> AWS
-    AWS -- scheduled export --> GCS
-```
 
 **Read this diagram top to bottom:** a client request hits CloudFront, which routes into the VPC to one of two ALBs, each fronting its own ECS Fargate service, both sharing a DynamoDB table. Microsoft EntraID federates operator identity into the account separately from the client traffic path. DynamoDB is exported to Google Cloud Storage on a schedule for disaster recovery.
+
+![Blue/green deployment flow with cutover and rollback](documentation/system architecture/shopeasy-multicloud-architecture-diagram1.png)
 
 \---
 
@@ -158,9 +133,10 @@ sequenceDiagram
 
 ## Blue/green deployment (zero downtime)
 
-<img src="documentation/system-architecture/CodeDeploy-BlueGreen-Cutover-CloudWatch-Gated-Rollback.png"
-     alt="Blue/green deployment"
-     width="60%">
+
+![Blue/green deployment flow with cutover and rollback](documentation/system architecture/CodeDeploy BlueGreen Cutover CloudWatch-Gated Rollback.png)
+
+![Blue/green deployment flow with cutover and rollback](https://raw.githubusercontent.com/Jasee-1234/<shopeasy-your-repo>/main/documentation/system architecture/CodeDeploy BlueGreen Cutover CloudWatch-Gated Rollback.png)
 
 ```
 CodeDeploy stands up the new task set (green) alongside the running one (blue), health-checks it behind the same target group, and only shifts traffic once green is confirmed healthy. Blue is kept running for a configurable rollback window — if green starts failing post-cutover, CodeDeploy shifts traffic back to blue automatically. Nothing is torn down until that window closes, so a bad deploy never causes a customer-facing outage.
@@ -188,7 +164,7 @@ CodeDeploy stands up the new task set (green) alongside the running one (blue), 
 ## Repository structure
 
 ```
-shopeasy/
+shopeasy-repo/
 ├── aws_backup_lambda/
 │   ├── main.tf
 │   ├── handler.py
@@ -198,9 +174,7 @@ shopeasy/
 │   ├── main.tf
 ├── documentation/
 │   ├── repository structure\_repository structure.png
-│   ├── system architecture\_shopeasy delivery lifecycle.png
-│   ├── terraform.tfstate
-│   └── terraform.tfvars
+│  └── system architecture\_shopeasy delivery lifecycle.png
 ├── frontend/
 │   ├── images/
 │   │   ├── hero.jpg
@@ -362,6 +336,8 @@ Engineers and operators never receive long-lived AWS IAM user credentials. Inste
 3. Entra groups are mapped to IAM roles — for example, `DevOpsEngineer` maps to an IAM role with ECS and Terraform-relevant permissions, and `ReadOnlyAuditor` maps to a read-only role.
 4. MFA and conditional access are enforced at the Entra ID layer.
 5. Signing in to the AWS Console happens via the Entra ID SSO portal, not an IAM login page.
+
+![Blue/green deployment flow with cutover and rollback](documentation/system architecture/shopeasy-multicloud-architecture-diagram2.png)
 
 \---
 
