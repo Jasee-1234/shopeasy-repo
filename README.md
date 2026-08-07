@@ -57,7 +57,7 @@ A few decisions worth calling out, because being able to explain *why*, not just
 
 **Read this diagram top to bottom:** a client request hits CloudFront, which routes into the VPC to one of two ALBs, each fronting its own ECS Fargate service, both sharing a DynamoDB table. Microsoft EntraID federates operator identity into the account separately from the client traffic path. DynamoDB is exported to Google Cloud Storage on a schedule for disaster recovery.
 
-![Blue/green deployment flow with cutover and rollback](documentation/system architecture/shopeasy-multicloud-architecture-diagram1.png)
+![Blue/green deployment flow with cutover and rollback](documentation/system-architecture/shopeasy-multicloud-architecture-diagram1.png)
 
 \---
 
@@ -118,6 +118,7 @@ sequenceDiagram
     B->>PALB: GET /products
     PALB->>PECS: Forward request
     PECS->>DDB: Query items
+
     DDB-->>PECS: Item list
     PECS-->>B: JSON product list
 
@@ -134,11 +135,9 @@ sequenceDiagram
 ## Blue/green deployment (zero downtime)
 
 
-![Blue/green deployment flow with cutover and rollback](documentation/system architecture/CodeDeploy BlueGreen Cutover CloudWatch-Gated Rollback.png)
+![Blue/green deployment flow with cutover and rollback](documentation/system-architecture/CodeDeploy BlueGreen Cutover CloudWatch-Gated Rollback.png)
 
-![Blue/green deployment flow with cutover and rollback](https://raw.githubusercontent.com/Jasee-1234/<shopeasy-your-repo>/main/documentation/system architecture/CodeDeploy BlueGreen Cutover CloudWatch-Gated Rollback.png)
 
-```
 CodeDeploy stands up the new task set (green) alongside the running one (blue), health-checks it behind the same target group, and only shifts traffic once green is confirmed healthy. Blue is kept running for a configurable rollback window — if green starts failing post-cutover, CodeDeploy shifts traffic back to blue automatically. Nothing is torn down until that window closes, so a bad deploy never causes a customer-facing outage.
 
 \---
@@ -173,8 +172,8 @@ shopeasy-repo/
 ├── bootstrap/
 │   ├── main.tf
 ├── documentation/
-│   ├── repository structure\_repository structure.png
-│  └── system architecture\_shopeasy delivery lifecycle.png
+│   ├── repository-structure\_repository structure.png
+│  └── system-architecture\_shopeasy delivery lifecycle.png
 ├── frontend/
 │   ├── images/
 │   │   ├── hero.jpg
@@ -337,7 +336,7 @@ Engineers and operators never receive long-lived AWS IAM user credentials. Inste
 4. MFA and conditional access are enforced at the Entra ID layer.
 5. Signing in to the AWS Console happens via the Entra ID SSO portal, not an IAM login page.
 
-![Blue/green deployment flow with cutover and rollback](documentation/system architecture/shopeasy-multicloud-architecture-diagram2.png)
+![Blue/green deployment flow with cutover and rollback](documentation/system-architecture/shopeasy-multicloud-architecture-diagram2.png)
 
 \---
 
